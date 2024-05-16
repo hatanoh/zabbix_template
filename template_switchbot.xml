@@ -19,6 +19,143 @@
             </groups>
             <discovery_rules>
                 <discovery_rule>
+                    <uuid>89d7f67c56a840ea92c753856d12cf27</uuid>
+                    <name>discover_switchbot_cleaner</name>
+                    <type>EXTERNAL</type>
+                    <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET}, &quot;https://api.switch-bot.com/v1.1/devices&quot;,&quot;cleaner&quot;]</key>
+                    <delay>1h</delay>
+                    <filter>
+                        <evaltype>AND</evaltype>
+                        <conditions>
+                            <condition>
+                                <macro>{#DEVICENAME}</macro>
+                                <value>{$DEVICENAME.MATCHES}</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                            <condition>
+                                <macro>{#DEVICENAME}</macro>
+                                <value>{$DEVICENAME.NOMATCHES}</value>
+                                <operator>NOT_MATCHES_REGEX</operator>
+                                <formulaid>B</formulaid>
+                            </condition>
+                            <condition>
+                                <macro>{#DEVICETYPE}</macro>
+                                <value>K10+</value>
+                                <formulaid>C</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <item_prototypes>
+                        <item_prototype>
+                            <uuid>78c7bdffdf564bdf8919ab98a13b9ddb</uuid>
+                            <name>Battery[{#DEVICENAME}]</name>
+                            <type>DEPENDENT</type>
+                            <key>sb.environment.cleaner.battery[{#DEVICENAME}]</key>
+                            <delay>0</delay>
+                            <units>%</units>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.battery</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET},&quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;cleaner&quot;]</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>component</tag>
+                                    <value>environment</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>66591f45904a409b9a72706644f78b27</uuid>
+                            <name>State[{#DEVICENAME}]</name>
+                            <type>DEPENDENT</type>
+                            <key>sb.environment.cleaner.workingStatus[{#DEVICENAME}]</key>
+                            <delay>0</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.workingStatus</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET},&quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;cleaner&quot;]</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>component</tag>
+                                    <value>environment</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>2802f881c5fc4a169e7785188f294c29</uuid>
+                            <name>sb.device.cleaner[{#DEVICENAME}]</name>
+                            <type>EXTERNAL</type>
+                            <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET},&quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;cleaner&quot;]</key>
+                            <delay>5m</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.body</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <uuid>d099669fca79417c814fa758e6033396</uuid>
+                            <name>Battery[{#DEVICENAME}]</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>274482</color>
+                                    <yaxisside>RIGHT</yaxisside>
+                                    <calc_fnc>ALL</calc_fnc>
+                                    <item>
+                                        <host>switchbot</host>
+                                        <key>sb.environment.cleaner.battery[{#DEVICENAME}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                    <lld_macro_paths>
+                        <lld_macro_path>
+                            <lld_macro>{#DEVICEID}</lld_macro>
+                            <path>$.deviceId</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#DEVICENAME}</lld_macro>
+                            <path>$.deviceName</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#DEVICETYPE}</lld_macro>
+                            <path>$.deviceType</path>
+                        </lld_macro_path>
+                    </lld_macro_paths>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.body.deviceList</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                </discovery_rule>
+                <discovery_rule>
                     <uuid>eed140c4ee1344d8b6e56a1123c5a15f</uuid>
                     <name>discover_switchbot_meter</name>
                     <type>EXTERNAL</type>
@@ -48,9 +185,9 @@
                     <item_prototypes>
                         <item_prototype>
                             <uuid>82b8da81ce824c67a40adf6bca9d586c</uuid>
-                            <name>sw.environment.battery[{#DEVICENAME}]</name>
+                            <name>Battery[{#DEVICENAME}]</name>
                             <type>DEPENDENT</type>
-                            <key>sw.environment.battery[{#DEVICENAME}]</key>
+                            <key>sb.environment.meter.battery[{#DEVICENAME}]</key>
                             <delay>0</delay>
                             <units>%</units>
                             <preprocessing>
@@ -62,7 +199,7 @@
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET}, &quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;meter&quot;]</key>
+                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET},&quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;meter&quot;]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -73,9 +210,9 @@
                         </item_prototype>
                         <item_prototype>
                             <uuid>882986fcab454d8fb77e3256cea7ef3e</uuid>
-                            <name>sw.environment.humidity[{#DEVICENAME}]</name>
+                            <name>Humidity[{#DEVICENAME}]</name>
                             <type>DEPENDENT</type>
-                            <key>sw.environment.humidity[{#DEVICENAME}]</key>
+                            <key>sb.environment.meter.humidity[{#DEVICENAME}]</key>
                             <delay>0</delay>
                             <units>%</units>
                             <preprocessing>
@@ -87,7 +224,7 @@
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET}, &quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;meter&quot;]</key>
+                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET},&quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;meter&quot;]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -98,9 +235,9 @@
                         </item_prototype>
                         <item_prototype>
                             <uuid>d299ed8006e54bd99beaa0cdd1f19df6</uuid>
-                            <name>sw.environment.tempreture[{#DEVICENAME}]</name>
+                            <name>Tempreture[{#DEVICENAME}]</name>
                             <type>DEPENDENT</type>
-                            <key>sw.environment.tempreture[{#DEVICENAME}]</key>
+                            <key>sb.environment.meter.tempreture[{#DEVICENAME}]</key>
                             <delay>0</delay>
                             <value_type>FLOAT</value_type>
                             <units>℃</units>
@@ -113,7 +250,7 @@
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET}, &quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;meter&quot;]</key>
+                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET},&quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;meter&quot;]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -124,9 +261,9 @@
                         </item_prototype>
                         <item_prototype>
                             <uuid>ed9c1472bba94ad8aa17ac47c32dd84c</uuid>
-                            <name>sw.device[{#DEVICENAME}]</name>
+                            <name>sb.device.meter[{#DEVICENAME}]</name>
                             <type>EXTERNAL</type>
-                            <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET}, &quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;meter&quot;]</key>
+                            <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET},&quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;meter&quot;]</key>
                             <delay>5m</delay>
                             <trends>0</trends>
                             <value_type>TEXT</value_type>
@@ -138,12 +275,6 @@
                                     </parameters>
                                 </step>
                             </preprocessing>
-                            <tags>
-                                <tag>
-                                    <tag>component</tag>
-                                    <value>environment</value>
-                                </tag>
-                            </tags>
                         </item_prototype>
                     </item_prototypes>
                     <graph_prototypes>
@@ -156,7 +287,7 @@
                                     <calc_fnc>ALL</calc_fnc>
                                     <item>
                                         <host>switchbot</host>
-                                        <key>sw.environment.tempreture[{#DEVICENAME}]</key>
+                                        <key>sb.environment.meter.tempreture[{#DEVICENAME}]</key>
                                     </item>
                                 </graph_item>
                                 <graph_item>
@@ -166,7 +297,17 @@
                                     <calc_fnc>ALL</calc_fnc>
                                     <item>
                                         <host>switchbot</host>
-                                        <key>sw.environment.humidity[{#DEVICENAME}]</key>
+                                        <key>sb.environment.meter.humidity[{#DEVICENAME}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>274482</color>
+                                    <yaxisside>RIGHT</yaxisside>
+                                    <calc_fnc>ALL</calc_fnc>
+                                    <item>
+                                        <host>switchbot</host>
+                                        <key>sb.environment.meter.battery[{#DEVICENAME}]</key>
                                     </item>
                                 </graph_item>
                             </graph_items>
@@ -226,9 +367,9 @@
                     <item_prototypes>
                         <item_prototype>
                             <uuid>61e9740d18604736a71b3c8067ae8aed</uuid>
-                            <name>sw.environment.current[{#DEVICENAME}]</name>
+                            <name>Current[{#DEVICENAME}]</name>
                             <type>DEPENDENT</type>
-                            <key>sw.environment.current[{#DEVICENAME}]</key>
+                            <key>sb.environment.plug.current[{#DEVICENAME}]</key>
                             <delay>0</delay>
                             <value_type>FLOAT</value_type>
                             <units>A</units>
@@ -247,7 +388,7 @@
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET}, &quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;plug&quot;]</key>
+                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET},&quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;plug&quot;]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -258,9 +399,9 @@
                         </item_prototype>
                         <item_prototype>
                             <uuid>2546644b1aa14ce683aaf9661ff6fd66</uuid>
-                            <name>sw.environment.power[{#DEVICENAME}]</name>
+                            <name>Power[{#DEVICENAME}]</name>
                             <type>DEPENDENT</type>
-                            <key>sw.environment.power[{#DEVICENAME}]</key>
+                            <key>sb.environment.plug.power[{#DEVICENAME}]</key>
                             <delay>0</delay>
                             <value_type>FLOAT</value_type>
                             <units>W</units>
@@ -273,7 +414,7 @@
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET}, &quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;plug&quot;]</key>
+                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET},&quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;plug&quot;]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -284,9 +425,9 @@
                         </item_prototype>
                         <item_prototype>
                             <uuid>a97a3348b9284c69bff1a47414e8a0df</uuid>
-                            <name>sw.environment.state[{#DEVICENAME}]</name>
+                            <name>State[{#DEVICENAME}]</name>
                             <type>DEPENDENT</type>
-                            <key>sw.environment.state[{#DEVICENAME}]</key>
+                            <key>sb.environment.plug.state[{#DEVICENAME}]</key>
                             <delay>0</delay>
                             <trends>0</trends>
                             <value_type>TEXT</value_type>
@@ -299,7 +440,7 @@
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET}, &quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;plug&quot;]</key>
+                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET},&quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;plug&quot;]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -310,9 +451,9 @@
                         </item_prototype>
                         <item_prototype>
                             <uuid>7d2df84b34f64c32b6bba9551680363b</uuid>
-                            <name>sw.environment.uptime[{#DEVICENAME}]</name>
+                            <name>Uptime[{#DEVICENAME}]</name>
                             <type>DEPENDENT</type>
-                            <key>sw.environment.uptime[{#DEVICENAME}]</key>
+                            <key>sb.environment.plug.uptime[{#DEVICENAME}]</key>
                             <delay>0</delay>
                             <units>min</units>
                             <preprocessing>
@@ -324,7 +465,7 @@
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET}, &quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;plug&quot;]</key>
+                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET},&quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;plug&quot;]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -335,9 +476,9 @@
                         </item_prototype>
                         <item_prototype>
                             <uuid>68bb0b950b254bb8b9d9b29c3d76bd7d</uuid>
-                            <name>sw.environment.voltage[{#DEVICENAME}]</name>
+                            <name>Voltage[{#DEVICENAME}]</name>
                             <type>DEPENDENT</type>
-                            <key>sw.environment.voltage[{#DEVICENAME}]</key>
+                            <key>sb.environment.plug.voltage[{#DEVICENAME}]</key>
                             <delay>0</delay>
                             <value_type>FLOAT</value_type>
                             <units>V</units>
@@ -350,7 +491,7 @@
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET}, &quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;plug&quot;]</key>
+                                <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET},&quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;plug&quot;]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -361,9 +502,9 @@
                         </item_prototype>
                         <item_prototype>
                             <uuid>4285533f0d724a84b21e2effbc1f5609</uuid>
-                            <name>sw.device[{#DEVICENAME}]</name>
+                            <name>sb.device.plug[{#DEVICENAME}]</name>
                             <type>EXTERNAL</type>
-                            <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET}, &quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;plug&quot;]</key>
+                            <key>switchbot_api_helper.py[{$AUTHORIZATION},{$CLIENT_SECRET},&quot;https://api.switch-bot.com/v1.1/devices/{#DEVICEID}/status&quot;,&quot;plug&quot;]</key>
                             <delay>5m</delay>
                             <trends>0</trends>
                             <value_type>TEXT</value_type>
@@ -375,14 +516,48 @@
                                     </parameters>
                                 </step>
                             </preprocessing>
-                            <tags>
-                                <tag>
-                                    <tag>component</tag>
-                                    <value>environment</value>
-                                </tag>
-                            </tags>
                         </item_prototype>
                     </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <uuid>3bc96ba782d34113bdf01ce11d27ed18</uuid>
+                            <name>Power[{#DEVICENAME}]</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>1A7C11</color>
+                                    <calc_fnc>ALL</calc_fnc>
+                                    <item>
+                                        <host>switchbot</host>
+                                        <key>sb.environment.plug.power[{#DEVICENAME}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <uuid>ad29c4d862e047df8ee24d3471e07085</uuid>
+                            <name>Voltage &amp; Current[{#DEVICENAME}]</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>F63100</color>
+                                    <calc_fnc>ALL</calc_fnc>
+                                    <item>
+                                        <host>switchbot</host>
+                                        <key>sb.environment.plug.voltage[{#DEVICENAME}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <yaxisside>RIGHT</yaxisside>
+                                    <calc_fnc>ALL</calc_fnc>
+                                    <item>
+                                        <host>switchbot</host>
+                                        <key>sb.environment.plug.current[{#DEVICENAME}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
                     <lld_macro_paths>
                         <lld_macro_path>
                             <lld_macro>{#DEVICEID}</lld_macro>
@@ -435,6 +610,80 @@
                     <value>0^</value>
                 </macro>
             </macros>
+            <dashboards>
+                <dashboard>
+                    <uuid>e2b079105b7c45dfbe55cc70bcca60c4</uuid>
+                    <name>Switchbot</name>
+                    <pages>
+                        <page>
+                            <widgets>
+                                <widget>
+                                    <type>graphprototype</type>
+                                    <width>12</width>
+                                    <height>5</height>
+                                    <fields>
+                                        <field>
+                                            <type>INTEGER</type>
+                                            <name>columns</name>
+                                            <value>1</value>
+                                        </field>
+                                        <field>
+                                            <type>GRAPH_PROTOTYPE</type>
+                                            <name>graphid</name>
+                                            <value>
+                                                <host>switchbot</host>
+                                                <name>Power[{#DEVICENAME}]</name>
+                                            </value>
+                                        </field>
+                                    </fields>
+                                </widget>
+                                <widget>
+                                    <type>graphprototype</type>
+                                    <y>5</y>
+                                    <width>12</width>
+                                    <height>5</height>
+                                    <fields>
+                                        <field>
+                                            <type>INTEGER</type>
+                                            <name>columns</name>
+                                            <value>1</value>
+                                        </field>
+                                        <field>
+                                            <type>GRAPH_PROTOTYPE</type>
+                                            <name>graphid</name>
+                                            <value>
+                                                <host>switchbot</host>
+                                                <name>Temperature &amp; Humidity[{#DEVICENAME}]</name>
+                                            </value>
+                                        </field>
+                                    </fields>
+                                </widget>
+                                <widget>
+                                    <type>graphprototype</type>
+                                    <x>12</x>
+                                    <width>12</width>
+                                    <height>5</height>
+                                    <fields>
+                                        <field>
+                                            <type>INTEGER</type>
+                                            <name>columns</name>
+                                            <value>1</value>
+                                        </field>
+                                        <field>
+                                            <type>GRAPH_PROTOTYPE</type>
+                                            <name>graphid</name>
+                                            <value>
+                                                <host>switchbot</host>
+                                                <name>Voltage &amp; Current[{#DEVICENAME}]</name>
+                                            </value>
+                                        </field>
+                                    </fields>
+                                </widget>
+                            </widgets>
+                        </page>
+                    </pages>
+                </dashboard>
+            </dashboards>
         </template>
     </templates>
 </zabbix_export>

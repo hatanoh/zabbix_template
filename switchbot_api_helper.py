@@ -29,12 +29,7 @@ apiHeader['t']=str(t)
 apiHeader['sign']=str(sign, 'utf-8')
 apiHeader['nonce']=str(nonce)
 
-#requests処理
 response = requests.get(url,headers=apiHeader)
-
-# レスポンス処理とデータ型変更
 data = response.json()
-
-# JSONデータを文字列に変換してprintで出力
-print(json.dumps(data, indent=2))
+print(json.dumps(data))
 

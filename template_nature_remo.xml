@@ -119,6 +119,12 @@
                             <master_item>
                                 <key>nr.device</key>
                             </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>component</tag>
+                                    <value>environment</value>
+                                </tag>
+                            </tags>
                         </item_prototype>
                         <item_prototype>
                             <uuid>ba054786ec2c411b87441b40aafadac2</uuid>
@@ -138,6 +144,12 @@
                             <master_item>
                                 <key>nr.device</key>
                             </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>component</tag>
+                                    <value>environment</value>
+                                </tag>
+                            </tags>
                         </item_prototype>
                         <item_prototype>
                             <uuid>a4ac09cab09840998d04f0ad3a6bf813</uuid>
@@ -158,6 +170,12 @@
                             <master_item>
                                 <key>nr.device</key>
                             </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>component</tag>
+                                    <value>environment</value>
+                                </tag>
+                            </tags>
                         </item_prototype>
                         <item_prototype>
                             <uuid>dacea4989d844e67be8258a1fa0a0bd6</uuid>
@@ -178,6 +196,12 @@
                             <master_item>
                                 <key>nr.device</key>
                             </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>component</tag>
+                                    <value>environment</value>
+                                </tag>
+                            </tags>
                         </item_prototype>
                         <item_prototype>
                             <uuid>48af86d5d883489390b614fdf1a80d1a</uuid>
@@ -198,6 +222,12 @@
                             <master_item>
                                 <key>nr.device</key>
                             </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>component</tag>
+                                    <value>environment</value>
+                                </tag>
+                            </tags>
                         </item_prototype>
                     </item_prototypes>
                     <graph_prototypes>
@@ -310,12 +340,37 @@
                                 </header>
                             </headers>
                             <output_format>JSON</output_format>
-                            <tags>
-                                <tag>
-                                    <tag>component</tag>
-                                    <value>environment</value>
-                                </tag>
-                            </tags>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>d6707ef471d449c6ad9af03f3093913c</uuid>
+                            <name>nr.appliance_1d[{#NAME}]</name>
+                            <type>HTTP_AGENT</type>
+                            <key>nr.appliance_1d[{#NAME}]</key>
+                            <delay>0;h0</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.body.first()</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <timeout>10s</timeout>
+                            <url>https://api.nature.global/1/devices/{#APPLIANCE_ID}/appliances</url>
+                            <follow_redirects>NO</follow_redirects>
+                            <headers>
+                                <header>
+                                    <name>Authorization</name>
+                                    <value>Bearer {$ACCESS_TOKEN}</value>
+                                </header>
+                                <header>
+                                    <name>Content-Type</name>
+                                    <value>application/json</value>
+                                </header>
+                            </headers>
+                            <output_format>JSON</output_format>
                         </item_prototype>
                         <item_prototype>
                             <uuid>73243da82541417eb44d72d025e6c15c</uuid>
@@ -347,16 +402,10 @@
                                 </header>
                             </headers>
                             <output_format>JSON</output_format>
-                            <tags>
-                                <tag>
-                                    <tag>component</tag>
-                                    <value>environment</value>
-                                </tag>
-                            </tags>
                         </item_prototype>
                         <item_prototype>
                             <uuid>3087c99d8fc144be9c675e40007b9820</uuid>
-                            <name>measured_instantaneous[{#NAME}]</name>
+                            <name>Power[{#NAME}]</name>
                             <type>DEPENDENT</type>
                             <key>nr.environment.measured_instantaneous[{#NAME}]</key>
                             <delay>0</delay>
@@ -381,12 +430,12 @@
                         </item_prototype>
                         <item_prototype>
                             <uuid>9ae93bbc5e594251b52195810cef72c8</uuid>
-                            <name>normal_direction_cumulative_electric_energy[{#NAME}]</name>
+                            <name>Cumulative_Power_30ｍ[{#NAME}]</name>
                             <type>DEPENDENT</type>
                             <key>nr.environment.normal_direction_cumulative_electric_energy[{#NAME}]</key>
                             <delay>0</delay>
                             <value_type>FLOAT</value_type>
-                            <units>Wh</units>
+                            <units>kWh</units>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
@@ -417,6 +466,44 @@
                                 </tag>
                             </tags>
                         </item_prototype>
+                        <item_prototype>
+                            <uuid>766cc6a246c94677986368fca4af5c4a</uuid>
+                            <name>Cumulative_Power_1d[{#NAME}]</name>
+                            <type>DEPENDENT</type>
+                            <key>nr.environment.normal_direction_cumulative_electric_energy_1d[{#NAME}]</key>
+                            <delay>0</delay>
+                            <value_type>FLOAT</value_type>
+                            <units>kWh</units>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.smart_meter.echonetlite_properties.[?(@.epc == 224)].val.first()</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <parameters>
+                                        <parameter>0.1</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>SIMPLE_CHANGE</type>
+                                    <parameters>
+                                        <parameter/>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>nr.appliance_1d[{#NAME}]</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>component</tag>
+                                    <value>environment</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
                     </item_prototypes>
                     <graph_prototypes>
                         <graph_prototype>
@@ -439,6 +526,16 @@
                                     <item>
                                         <host>Nature Remo</host>
                                         <key>nr.environment.normal_direction_cumulative_electric_energy[{#NAME}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>274482</color>
+                                    <yaxisside>RIGHT</yaxisside>
+                                    <calc_fnc>ALL</calc_fnc>
+                                    <item>
+                                        <host>Nature Remo</host>
+                                        <key>nr.environment.normal_direction_cumulative_electric_energy_1d[{#NAME}]</key>
                                     </item>
                                 </graph_item>
                             </graph_items>
@@ -485,6 +582,7 @@
             <macros>
                 <macro>
                     <macro>{$ACCESS_TOKEN}</macro>
+                    <description>Token</description>
                 </macro>
                 <macro>
                     <macro>{$DEVICENAME.MATCHES}</macro>
@@ -495,6 +593,59 @@
                     <value>0^</value>
                 </macro>
             </macros>
+            <dashboards>
+                <dashboard>
+                    <uuid>2d175af7e4c14d42aa6d6369b886c097</uuid>
+                    <name>Natureremo</name>
+                    <pages>
+                        <page>
+                            <widgets>
+                                <widget>
+                                    <type>graphprototype</type>
+                                    <width>12</width>
+                                    <height>5</height>
+                                    <fields>
+                                        <field>
+                                            <type>INTEGER</type>
+                                            <name>columns</name>
+                                            <value>1</value>
+                                        </field>
+                                        <field>
+                                            <type>GRAPH_PROTOTYPE</type>
+                                            <name>graphid</name>
+                                            <value>
+                                                <host>Nature Remo</host>
+                                                <name>Power[{#NAME}]</name>
+                                            </value>
+                                        </field>
+                                    </fields>
+                                </widget>
+                                <widget>
+                                    <type>graphprototype</type>
+                                    <x>12</x>
+                                    <width>12</width>
+                                    <height>5</height>
+                                    <fields>
+                                        <field>
+                                            <type>INTEGER</type>
+                                            <name>columns</name>
+                                            <value>1</value>
+                                        </field>
+                                        <field>
+                                            <type>GRAPH_PROTOTYPE</type>
+                                            <name>graphid</name>
+                                            <value>
+                                                <host>Nature Remo</host>
+                                                <name>Temperature &amp; Humidity[{#NAME}]</name>
+                                            </value>
+                                        </field>
+                                    </fields>
+                                </widget>
+                            </widgets>
+                        </page>
+                    </pages>
+                </dashboard>
+            </dashboards>
         </template>
     </templates>
 </zabbix_export>
