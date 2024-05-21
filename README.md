@@ -6,10 +6,34 @@
 - template_switchbot.xml  
  switchbotデータ取得用テンプレート
 - switchbot_api_helper.py  
- switchbotAPI取得用ヘルパースクリプト。  
- zbx_env/usr/lib/zabbix/externalscriptsに置きます。  
- 使用にはpythonとpy-requestsが必要です。  
- 標準のdocker compose (docker-compose_v3_alpine_pgsql_latest.yaml) を使用した場合どちらも入っていませんので、Dockerfileに追記してlocal.yamlの方でupするとよいかと思います。
+ switchbotAPI取得用ヘルパースクリプト  
+ zbx_env/usr/lib/zabbix/externalscriptsに置きます  
+ 使用にはpythonとpy-requestsが必要です
+- template_ups_nut.xml  
+ Network UPS Tools データ取得用テンプレート
+- upsc_wrapper.sh  
+ Network UPS Tools データ取得用ヘルパースクリプト  
+ zbx_env/usr/lib/zabbix/externalscriptsに置きます  
+ 使用にはnutcが必要です
+
+## docker compose Dockerfile
+ docker-compose_v3_alpine_pgsql_latest.yaml を使用した場合、nutcやpythonは入っていませんので、Dockerfileに追記してlocal.yamlの方でupするとよいかと思います。
+``` diff Dockerfile
+diff --git a/Dockerfiles/server-pgsql/alpine/Dockerfile b/Dockerfiles/server-pgsql/alpine/Dockerfile
+index 3f7b8832b..777fa0f12 100644
+--- a/Dockerfiles/server-pgsql/alpine/Dockerfile
++++ b/Dockerfiles/server-pgsql/alpine/Dockerfile
+@@ -56,6 +56,9 @@ RUN set -eux && \
+             pcre2 \
+             postgresql-client \
+             postgresql-libs \
++            python3 \
++            py3-requests \
++            nut \
+             gzip \
+             unixodbc \
+             zlib" && \
+```
 
 ## NatureRemo
 ### 対象デバイス
@@ -82,5 +106,28 @@ Switchbot社製の温湿度計、温湿度計プラス、防水温湿度計。�
 |-|-|-|
 |{$AUTHORIZATION}|なし|トークン|
 |{$CLIENT_SECRET}|なし|クライアントシークレット|
+
+## Network UPS Tools
+### 対象デバイス
+|センサ|更新間隔|
+|-|-|
+|バッテリ電圧|1m|
+|入力電源電圧|1m|
+|入力電源周波数|1m|
+|出力電圧|1m|
+|UPS負荷|1m|
+|UPS温度|1m|
+|UPS状態|1m|
+### 使い方
+1. /usr/lib/zabbix/externalscripts にupsc_wrapper.shを置き、実行可能にしておきます。
+1. インポートして適当なホストにテンプレートとして設定。
+1. マクロUPSDにUPS名@UPSDホスト名を設定します。
+### クライアント実行間隔
+1mに1度実行します。
+### マクロ
+|マクロ名|既定値|説明|
+|-|-|-|
+|{$UPSD}|なし|UPS名@UPSDホスト名|
+
 |{$DEVICENAME.MATCHES}|.+|このマクロにマッチした名前のセンサーのデータを取得します|
 |{$DEVICENAME.NOMATCHES}|0^|このマクロにマッチした名前のセンサーのデータは取得しません|
